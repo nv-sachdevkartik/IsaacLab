@@ -271,7 +271,9 @@ class TerrainImporter:
         mesh_prim = UsdGeom.Mesh(mesh_prim)
         # store the mesh
         vertices = np.asarray(mesh_prim.GetPointsAttr().Get())
-        faces = np.asarray(mesh_prim.GetFaceVertexIndicesAttr().Get()).reshape(-1, 3)
+        face_indices = np.asarray(mesh_prim.GetFaceVertexIndicesAttr().Get())
+        num_valid_indices = (len(face_indices) // 3) * 3
+        faces = face_indices[:num_valid_indices].reshape(-1, 3)
         self.meshes[key] = trimesh.Trimesh(vertices=vertices, faces=faces)
         # create a warp mesh
         device = "cuda" if "cuda" in self.device else "cpu"
