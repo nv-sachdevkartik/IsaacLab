@@ -70,7 +70,7 @@ class SensorsSceneCfg(InteractiveSceneCfg):
         terrain_generator=ROUGH_TERRAINS_CFG.replace(color_scheme="random"),
         visual_material=None,
         debug_vis=False,
-        usd_path="/home/ksachdev/evaluations/isaaclab/customers/agility/Collected_warehouse_20x20_Agility/warehouse_20x20_layout_02.usd",
+        usd_path="<PATH_TO_YOUR_USD_FILE>",
     )
 
     # lights

@@ -50,6 +50,33 @@ def dump_yaml(filename: str, data: dict | object, sort_keys: bool = False):
     # convert data into dictionary
     if not isinstance(data, dict):
         data = class_to_dict(data)
+
+    # Create custom dumper with better representations
+    class CustomDumper(yaml.SafeDumper):
+        pass
+
+    # Register custom representers
+    CustomDumper.add_representer(tuple, represent_tuple)
+    CustomDumper.add_representer(slice, represent_slice)
+    CustomDumper.ignore_aliases = lambda *args: True  # Prevent alias references
+
     # save data
     with open(filename, "w") as f:
-        yaml.dump(data, f, default_flow_style=False, sort_keys=sort_keys)
+        yaml.dump(
+            data, f, Dumper=CustomDumper, default_flow_style=False, sort_keys=sort_keys
+        )
+
+
+def represent_tuple(dumper: yaml.Dumper, data: tuple) -> yaml.Node:
+    """Convert Python tuple to YAML sequence."""
+    return dumper.represent_sequence("tag:yaml.org,2002:seq", list(data))
+
+
+def represent_slice(dumper: yaml.Dumper, data: slice) -> yaml.Node:
+    """Convert Python slice to YAML null if all attributes are None."""
+    if data.start is None and data.stop is None and data.step is None:
+        return dumper.represent_scalar("tag:yaml.org,2002:null", "")
+    # If not all None, represent as sequence of start:stop:step
+    return dumper.represent_sequence(
+        "tag:yaml.org,2002:seq", [data.start, data.stop, data.step]
+    )
